@@ -39,7 +39,24 @@ $(document).ready(function() {
       { "data": "成分", "defaultContent": "" },
       { "data": "劑量", "defaultContent": "" },
       { "data": "位置", "defaultContent": "" },
-      { "data": "庫存", "defaultContent": "" },
+      { 
+        "data": "庫存",
+        "defaultContent": "",
+        "render": function(data, type, row, meta) {
+          if (type === 'display') {
+            var select = $('<select/>').attr({ 'id': 'inventory', 'name': 'inventory' });
+            for (var i = 1; i <= 10; i++) {
+              var option = $('<option/>').attr({ 'value': i }).text(i);
+              if (i.toString() === data) {
+                option.attr('selected', 'selected');
+              }
+              select.append(option);
+            }
+            return $('<div/>').append(select).html();
+          }
+          return data;
+        }
+      },
       { "data": "備註", "defaultContent": "" },
     ],
     
