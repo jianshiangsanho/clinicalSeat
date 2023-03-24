@@ -1,3 +1,22 @@
+function tsvToJson(tsv) {
+  var lines = tsv.split('\n');
+  var result = [];
+  var headers = lines[0].split('\t');
+
+  for (var i = 1; i < lines.length; i++) {
+    var obj = {};
+    var currentline = lines[i].split('\t');
+
+    for (var j = 0; j < headers.length; j++) {
+      obj[headers[j]] = currentline[j] || null; // 使用 null 來代表缺失值
+    }
+
+    result.push(obj);
+  }
+
+  return result;
+}
+
 $(document).ready(function() {
   $('#example').DataTable({
     "processing": true,
@@ -20,21 +39,26 @@ $(document).ready(function() {
       { "data": "成分", "defaultContent": "" },
       { "data": "劑量", "defaultContent": "" },
       { "data": "位置", "defaultContent": "" },
-      { "data": "庫存",
-        "render": function ( data, type, row ) {
-          return '<select><option value="1">1</option><option value="2">2</option></select>';
+      { 
+        "data": "庫存",
+        "defaultContent": "",
+        "render": function(data, type, row, meta) {
+          if (type === 'display') {
+            var select = $('<select/>').attr({ 'id': 'inventory', 'name': 'inventory' });
+            for (var i = 1; i <= 10; i++) {
+              var option = $('<option/>').attr({ 'value': i }).text(i);
+              if (i.toString() === data) {
+                option.attr('selected', 'selected');
+              }
+              select.append(option);
+            }
+            return $('<div/>').append(select).html();
+          }
+          return data;
         }
       },
       { "data": "備註", "defaultContent": "" },
     ],
-    "initComplete": function () {
-      var table = $('#example').DataTable();
-      $('#example thead tr').append('<th>庫存</th>');
-      table.columns().header().each(function (colIdx) {
-        if (table.column(colIdx).header().textContent === '') {
-          $('#example thead th').eq(colIdx).html('欄位' + (colIdx + 1));
-        }
-      });
-    }
+    
   });
 });
